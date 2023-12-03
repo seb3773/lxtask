@@ -66,9 +66,14 @@ GtkWidget* create_main_window (void)
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-gint default_width = win_width; 
-gint default_height = win_height * 1.6; 
-gtk_window_resize(GTK_WINDOW(window), default_width, default_height);
+// retrieve screen res
+    GdkScreen *screen = gtk_window_get_screen(GTK_WINDOW(window));
+    gint screen_width = gdk_screen_get_width(screen);
+    gint screen_height = gdk_screen_get_height(screen);
+    // define windows size
+    gint width_in_pixels = screen_width / 2;
+    gint height_in_pixels = screen_height / 1.5;
+    gtk_window_resize(GTK_WINDOW(window), width_in_pixels, height_in_pixels);
 
     gtk_window_set_title (GTK_WINDOW (window), _("Task Manager"));
     gtk_window_set_default_size (GTK_WINDOW (window), win_width, win_height);

@@ -65,9 +65,17 @@ GtkWidget* create_main_window (void)
     GtkWidget *system_info_box;
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+
+gint default_width = win_width; 
+gint default_height = win_height * 1.6; 
+gtk_window_resize(GTK_WINDOW(window), default_width, default_height);
+
     gtk_window_set_title (GTK_WINDOW (window), _("Task Manager"));
     gtk_window_set_default_size (GTK_WINDOW (window), win_width, win_height);
     gtk_window_set_icon_name (GTK_WINDOW (window),"utilities-system-monitor");
+
+    // Set the window position to center
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 
     bbox1 = gtk_vbox_new (FALSE, 10);
     gtk_widget_show (bbox1);

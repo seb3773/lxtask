@@ -46,10 +46,39 @@ GtkTreeViewColumn *column;
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
+void on_kill_button_clicked(GtkButton *button, gpointer user_data);
+
 void show_preferences(void);
 extern gint refresh_interval;
 extern guint rID;
 GtkWidget *refresh_spin;
+
+
+void on_kill_button_clicked(GtkButton *button, gpointer user_data)
+{
+    if (confirm(_("Really kill the task?")))
+    {
+        gchar *task_id = "";
+        GtkTreeModel *model;
+        GtkTreeIter iter;
+
+        if (gtk_tree_selection_get_selected(selection, &model, &iter))
+        {
+            gtk_tree_model_get(model, &iter, COLUMN_PID, &task_id, -1);
+            if (atoi(task_id) == getpid())
+            {
+                show_error(_("Can't kill the process itself"));
+            }
+            else
+            {
+                send_signal_to_task(atoi(task_id), SIGNAL_KILL);
+                refresh_task_list();
+            }
+        }
+    }
+}
+
+
 
 GtkWidget* create_main_window (void)
 {
@@ -174,6 +203,10 @@ GtkWidget* create_main_window (void)
     gtk_widget_show (treeview);
     gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview);
 
+
+gtk_widget_modify_base(treeview, GTK_STATE_SELECTED, &(GdkColor){0, 40000,  65535, 65535});
+
+
     create_list_store();
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
@@ -191,13 +224,16 @@ GtkWidget* create_main_window (void)
     gtk_widget_show (button3);
     gtk_box_pack_start (GTK_BOX (bbox1), button3, FALSE, FALSE, 0);
 
-    button1 = gtk_button_new_from_stock ("gtk-quit");
+    button1 = gtk_button_new_from_stock ("kill task");
     gtk_widget_show (button1);
     gtk_box_pack_start (GTK_BOX (bbox1), button1, FALSE, FALSE, 0);
 
+
+   g_signal_connect(button1, "clicked", G_CALLBACK(on_kill_button_clicked), NULL);
+
     g_signal_connect ((gpointer) window, "destroy", G_CALLBACK (on_quit), NULL);
     g_signal_connect_swapped ((gpointer) treeview, "button-press-event", G_CALLBACK(on_treeview1_button_press_event), NULL);
-    g_signal_connect ((gpointer) button1, "clicked",  G_CALLBACK (on_quit),  NULL);
+  //  g_signal_connect ((gpointer) button1, "clicked",  G_CALLBACK (on_quit),  NULL);
     g_signal_connect ((gpointer) button3, "toggled",  G_CALLBACK (on_button3_toggled_event),  NULL);
 
     return window;

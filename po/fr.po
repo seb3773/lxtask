@@ -67,12 +67,16 @@ msgstr "Impossible pour le processus de s'arrêter"
 #: ../src/functions.c:149
 #, c-format
 msgid "Memory: %d MB of %d MB used"
-msgstr "Mémoire : %d Mo de %d Mo utilisés"
+msgstr "Mémoire : %d Mo sur %d Mo utilisés"
+
+#, c-format
+msgid "Swap: %d MB of %d MB used"
+msgstr "Swap: %d MB sur %d MB utilisés"
 
 #: ../src/functions.c:158
 #, c-format
-msgid "CPU usage: %0.0f %%"
-msgstr "Utilisation du processeur : %0.0f %%"
+msgid "CPU usage: %0.0f %% at %0.2f GHz"
+msgstr "Utilisation du processeur : %0.0f %% à %0.2f GHz"
 
 #: ../src/interface.c:82
 msgid "_File"
@@ -98,9 +102,14 @@ msgstr "Mémoire utilisée"
 msgid "more details"
 msgstr "Plus de détails"
 
+msgid "End task"
+msgstr "Fin de tâche"
+
 #: ../src/interface.c:201
-msgid "Command"
-msgstr "Processus"
+msgid "Name"
+msgstr "Nom"
+
+
 
 #: ../src/interface.c:207
 msgid "User"
@@ -155,24 +164,24 @@ msgid "Priority"
 msgstr "Priorité"
 
 #: ../src/interface.c:301
-msgid "  -10"
-msgstr "  -10"
+msgid "  High"
+msgstr "  Haute"
 
 #: ../src/interface.c:306
-msgid "  -5"
-msgstr "  -5"
+msgid "  Above Normal"
+msgstr "  Supérieure à la normale"
 
 #: ../src/interface.c:311
-msgid "    0"
-msgstr "    0"
+msgid "  Normal"
+msgstr "  Normale"
 
 #: ../src/interface.c:316
-msgid "   5"
-msgstr "   5"
+msgid "  Below Normal"
+msgstr "  En dessous de la normale"
 
 #: ../src/interface.c:321
-msgid "   10"
-msgstr "   10"
+msgid "  Low"
+msgstr "  Basse"
 
 #: ../src/interface.c:347
 msgid "Show user tasks"

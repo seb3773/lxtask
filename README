@@ -1,5 +1,16 @@
-LXTask - lightweight and desktop-independent task manager derived from
-xfce4-taskmanager with all dependencies on xfce removed, new features,
-and some improvement of the user interface.
+LXTask - lightweight and desktop-independent task manager derived from xfce4-taskmanager with all dependencies on xfce removed,
+new features,and some improvement of the user interface.
+
+## This fork has the following modifications:
+
+-Added swap usage/total gauge
+-Added CPU Speed in existing CPU gauge
+-Differents colors for each gauge
+-Button 'Quit' replaced by a 'End task button' (we can close the windows with esc or the close button on the titlebar, I don't
+ think I need a third quit button :p ) and it's more like win taskmgr end task button :)
+-Replaced the priorities numbers by more comprehensible terms
+-some interface color modifications
+-some terms changed
+
 
 Notes for compilation: it requires intltool and GTK+ 2.6 or newer.

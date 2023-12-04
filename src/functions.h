@@ -44,6 +44,7 @@
 
 gboolean refresh_task_list(void);
 gdouble get_cpu_usage(system_status *sys_stat);
+extern gdouble cpu_speed_value;
 
 /* Configurationfile support */
 void load_config(void);

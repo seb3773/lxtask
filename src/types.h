@@ -47,6 +47,8 @@ typedef struct
     guint64 mem_free;
     guint64 mem_cached;
     guint64 mem_buffered;
+guint64 swap_total;
+guint64 swap_used;
     guint64 cpu_count;
     guint64 cpu_idle;
     guint64 cpu_user;

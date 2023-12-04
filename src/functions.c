@@ -32,8 +32,41 @@
 #include "functions.h"
 
 extern gint refresh_interval;
+gdouble cpu_speed_value;
+
 
 static system_status *sys_stat =NULL;
+
+gdouble get_cpu_speed(void)
+{
+    FILE *cpuinfo = fopen("/proc/cpuinfo", "r");
+    if (cpuinfo == NULL)
+    {
+        perror("Error opening /proc/cpuinfo");
+        return 0.0;
+    }
+
+    char line[256];
+    gdouble cpu_speed_value = 0.0;
+
+    while (fgets(line, sizeof(line), cpuinfo))
+    {
+        if (strncmp(line, "cpu MHz", 7) == 0)
+        {
+            char *start = strchr(line, ':');
+            if (start != NULL)
+            {
+                sscanf(start + 1, "%lf", &cpu_speed_value);
+                break;
+            }
+        }
+    }
+
+    fclose(cpuinfo);
+    return cpu_speed_value / 1000.0; // Convert MHz to GHz
+}
+
+
 
 gboolean refresh_task_list(void)
 {
@@ -135,10 +168,42 @@ gboolean refresh_task_list(void)
 
     g_array_free(new_task_list, TRUE);
 
+void get_swap_info(guint64 *swap_total, guint64 *swap_free)
+{
+    FILE *meminfo = fopen("/proc/meminfo", "r");
+    if (meminfo == NULL)
+    {
+        perror("Error opening /proc/meminfo");
+        *swap_total = 0;
+        *swap_free = 0;
+        return;
+    }
+
+    char line[256];
+    *swap_total = 0;
+    *swap_free = 0;
+
+    while (fgets(line, sizeof(line), meminfo))
+    {
+        if (strncmp(line, "SwapTotal:", 10) == 0)
+        {
+            sscanf(line + 10, "%llu", swap_total);
+        }
+        else if (strncmp(line, "SwapFree:", 9) == 0)
+        {
+            sscanf(line + 9, "%llu", swap_free);
+        }
+    }
+
+    fclose(meminfo);
+}
     /* update the CPU and memory progress bars */
     if (sys_stat == NULL)
         sys_stat = g_new0 (system_status, 1);
     get_system_status (sys_stat);
+
+    // Retrieve CPU speed
+    cpu_speed_value = get_cpu_speed(); 
 
     memory_used = sys_stat->mem_total - sys_stat->mem_free;
     if ( show_cached_as_free )
@@ -154,8 +219,29 @@ gboolean refresh_task_list(void)
         gtk_progress_bar_set_text (GTK_PROGRESS_BAR (mem_usage_progress_bar), tooltip);
     }
 
+
+
+// Update the swap progress bar
+guint64 swap_total, swap_free;
+get_swap_info(&swap_total, &swap_free);
+
+// Calculate used swap
+guint64 swap_used = swap_total - swap_free;
+
+if (swap_total > 0)
+{
+    gchar swap_tooltip[256];
+    sprintf(swap_tooltip, _("Swap: %d MB of %d MB used"), (int)(swap_used / 1024), (int)(swap_total / 1024));
+
+    if (strcmp(swap_tooltip, gtk_progress_bar_get_text(GTK_PROGRESS_BAR(swap_usage_progress_bar))))
+    {
+        gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(swap_usage_progress_bar), (gdouble)swap_used / swap_total);
+        gtk_progress_bar_set_text(GTK_PROGRESS_BAR(swap_usage_progress_bar), swap_tooltip);
+    }
+}
+
     cpu_usage = get_cpu_usage (sys_stat);
-    sprintf (tooltip,_("CPU usage: %0.0f %%"), cpu_usage * 100.0);
+    sprintf(tooltip, _("CPU usage: %0.0f %% at %0.2f GHz"), cpu_usage * 100.0, cpu_speed_value);
     if(strcmp(tooltip,gtk_progress_bar_get_text(GTK_PROGRESS_BAR(cpu_usage_progress_bar))))
     {
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (cpu_usage_progress_bar), cpu_usage);
@@ -332,3 +418,4 @@ void save_config(void)
 
     fclose(rc_file);
 }
+

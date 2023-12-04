@@ -36,7 +36,8 @@ GtkWidget *cpu_usage_progress_bar;
 GtkWidget *mem_usage_progress_bar;
 GtkWidget *cpu_usage_progress_bar_box;
 GtkWidget *mem_usage_progress_bar_box;
-
+GtkWidget *swap_usage_progress_bar_box;
+GtkWidget *swap_usage_progress_bar;
 GtkTreeViewColumn *column;
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
@@ -173,6 +174,10 @@ GtkWidget* create_main_window (void)
 
     cpu_usage_progress_bar_box = gtk_event_box_new ();
     cpu_usage_progress_bar = gtk_progress_bar_new ();
+
+GdkColor blue_color;
+gdk_color_parse("#59a6d3", &blue_color);
+gtk_widget_modify_bg(GTK_WIDGET(cpu_usage_progress_bar), GTK_STATE_PRELIGHT, &blue_color);
 #if GTK_CHECK_VERSION(3,0,0)
     gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (cpu_usage_progress_bar), TRUE);
 #endif
@@ -184,6 +189,9 @@ GtkWidget* create_main_window (void)
 
     mem_usage_progress_bar_box = gtk_event_box_new ();
     mem_usage_progress_bar = gtk_progress_bar_new ();
+GdkColor purple_color;
+gdk_color_parse("#aa62be", &purple_color); 
+gtk_widget_modify_bg(GTK_WIDGET(mem_usage_progress_bar), GTK_STATE_PRELIGHT, &purple_color);
 #if GTK_CHECK_VERSION(3,0,0)
     gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (mem_usage_progress_bar), TRUE);
 #endif
@@ -192,6 +200,22 @@ GtkWidget* create_main_window (void)
     gtk_widget_show (mem_usage_progress_bar_box);
     gtk_container_add (GTK_CONTAINER (mem_usage_progress_bar_box), mem_usage_progress_bar);
     gtk_box_pack_start (GTK_BOX (system_info_box), mem_usage_progress_bar_box, TRUE, TRUE, 0);
+
+//new swap gauge
+swap_usage_progress_bar_box = gtk_event_box_new ();
+swap_usage_progress_bar = gtk_progress_bar_new ();
+GdkColor orange_color;
+gdk_color_parse("#FFA500", &orange_color);
+gtk_widget_modify_bg(GTK_WIDGET(swap_usage_progress_bar), GTK_STATE_PRELIGHT, &orange_color);
+#if GTK_CHECK_VERSION(3,0,0)
+    gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (swap_usage_progress_bar), TRUE);
+#endif
+    gtk_progress_bar_set_text (GTK_PROGRESS_BAR (swap_usage_progress_bar), _("swap usage"));
+    gtk_widget_show (swap_usage_progress_bar);
+    gtk_widget_show (swap_usage_progress_bar_box);
+    gtk_container_add (GTK_CONTAINER (swap_usage_progress_bar_box), swap_usage_progress_bar);
+    gtk_box_pack_start (GTK_BOX (system_info_box), swap_usage_progress_bar_box, TRUE, TRUE, 0);
+
 
     scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (scrolledwindow1);
@@ -204,8 +228,9 @@ GtkWidget* create_main_window (void)
     gtk_container_add (GTK_CONTAINER (scrolledwindow1), treeview);
 
 
-gtk_widget_modify_base(treeview, GTK_STATE_SELECTED, &(GdkColor){0, 40000,  65535, 65535});
-
+GdkColor selected_color;
+gdk_color_parse("#0D7EFF", &selected_color);
+gtk_widget_modify_base(treeview, GTK_STATE_SELECTED, &selected_color);
 
     create_list_store();
 
@@ -224,7 +249,7 @@ gtk_widget_modify_base(treeview, GTK_STATE_SELECTED, &(GdkColor){0, 40000,  6553
     gtk_widget_show (button3);
     gtk_box_pack_start (GTK_BOX (bbox1), button3, FALSE, FALSE, 0);
 
-    button1 = gtk_button_new_from_stock ("kill task");
+    button1 = gtk_button_new_with_label (_("End task"));
     gtk_widget_show (button1);
     gtk_box_pack_start (GTK_BOX (bbox1), button1, FALSE, FALSE, 0);
 
@@ -248,7 +273,7 @@ void create_list_store(void)
 
     cell_renderer = gtk_cell_renderer_text_new();
 
-    column = gtk_tree_view_column_new_with_attributes(_("Command"), cell_renderer, "text", COLUMN_NAME, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Name"), cell_renderer, "text", COLUMN_NAME, NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sort_column_id(column, COLUMN_NAME);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(list_store), COLUMN_NAME, compare_string_list_item, GUINT_TO_POINTER(COLUMN_NAME), NULL);
@@ -263,13 +288,13 @@ void create_list_store(void)
     cell_renderer = gtk_cell_renderer_text_new();
     g_object_set(cell_renderer, "xalign", 1.0, NULL);
 
-    column = gtk_tree_view_column_new_with_attributes(_("CPU%"), cell_renderer, "text", COLUMN_TIME, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("CPU"), cell_renderer, "text", COLUMN_TIME, NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sort_column_id(column, COLUMN_TIME);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(list_store), COLUMN_TIME, compare_int_list_item, GUINT_TO_POINTER(COLUMN_TIME), NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-    column = gtk_tree_view_column_new_with_attributes(_("RSS"), cell_renderer, "text", COLUMN_RSS, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Memory"), cell_renderer, "text", COLUMN_RSS, NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sort_column_id(column, COLUMN_RSS);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(list_store), COLUMN_RSS, compare_size_list_item, GUINT_TO_POINTER(COLUMN_RSS), NULL);
@@ -287,7 +312,7 @@ void create_list_store(void)
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(list_store), COLUMN_PID, compare_int_list_item, GUINT_TO_POINTER(COLUMN_PID), NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-    column = gtk_tree_view_column_new_with_attributes(_("State"), cell_renderer, "text", COLUMN_STATE, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Status"), cell_renderer, "text", COLUMN_STATE, NULL);
     gtk_tree_view_column_set_resizable(column, TRUE);
     gtk_tree_view_column_set_sort_column_id(column, COLUMN_STATE);
     gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(list_store), COLUMN_STATE, compare_string_list_item, GUINT_TO_POINTER(COLUMN_STATE), NULL);
@@ -348,27 +373,27 @@ GtkWidget *create_prio_submenu(void)
     GtkWidget *prio_submenu = gtk_menu_new ();
     GtkWidget *menu_item;
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("  -10"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("  High"));
     gtk_widget_show (menu_item);
     gtk_container_add (GTK_CONTAINER (prio_submenu), menu_item);
     g_signal_connect ((gpointer) menu_item, "activate", G_CALLBACK (handle_prio_menu), "-10");
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("  -5"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("  Above Normal"));
     gtk_widget_show (menu_item);
     gtk_container_add (GTK_CONTAINER (prio_submenu), menu_item);
     g_signal_connect ((gpointer) menu_item, "activate", G_CALLBACK (handle_prio_menu), "-5");
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("    0"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("  Normal"));
     gtk_widget_show (menu_item);
     gtk_container_add (GTK_CONTAINER (prio_submenu), menu_item);
     g_signal_connect ((gpointer) menu_item, "activate", G_CALLBACK (handle_prio_menu), "0");
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("   5"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("  Below Normal"));
     gtk_widget_show (menu_item);
     gtk_container_add (GTK_CONTAINER (prio_submenu), menu_item);
     g_signal_connect ((gpointer) menu_item, "activate", G_CALLBACK (handle_prio_menu), "5");
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("   10"));
+    menu_item = gtk_menu_item_new_with_mnemonic (_("  Low"));
     gtk_widget_show (menu_item);
     gtk_container_add (GTK_CONTAINER (prio_submenu), menu_item);
     g_signal_connect ((gpointer) menu_item, "activate", G_CALLBACK (handle_prio_menu), "10");

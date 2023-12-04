@@ -47,6 +47,7 @@ extern GtkWidget *cpu_usage_progress_bar;
 extern GtkWidget *mem_usage_progress_bar;
 extern GtkWidget *cpu_usage_progress_bar_box;
 extern GtkWidget *mem_usage_progress_bar_box;
+extern GtkWidget *swap_usage_progress_bar;
 
 enum {
     COLUMN_NAME = 0,

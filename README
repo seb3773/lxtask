@@ -11,7 +11,8 @@ new features,and some improvement of the user interface.
 -Replaced the priorities numbers by more comprehensible terms
 -some interface color modifications
 -some terms changed
--systray icon with cpu load indicator 'ala windows'.
+-systray icon with cpu load indicator 'ala windows'
+-systray menu with 'keep above' and quit   ;)
 
 
 Notes for compilation: it requires intltool and GTK+ 2.6 or newer.

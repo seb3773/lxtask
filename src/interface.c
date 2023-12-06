@@ -27,6 +27,7 @@
 #include <glib/gi18n.h>
 #include "interface.h"
 
+
 GtkTreeStore *list_store;
 GtkTreeSelection *selection;
 GtkWidget *treeview;

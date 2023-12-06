@@ -59,6 +59,7 @@ guint64 swap_used;
     gboolean valid_proc_reading;
 } system_status;
 
+extern GtkStatusIcon *global_status_icon;
 extern GtkWidget *main_window;
 
 extern GArray *task_array;

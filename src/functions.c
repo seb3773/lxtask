@@ -30,6 +30,9 @@
 #include <stdio.h>
 
 #include "functions.h"
+#include "types.h"
+
+
 
 extern gint refresh_interval;
 gdouble cpu_speed_value;
@@ -65,6 +68,9 @@ gdouble get_cpu_speed(void)
     fclose(cpuinfo);
     return cpu_speed_value / 1000.0; // Convert MHz to GHz
 }
+
+
+
 
 
 
@@ -247,6 +253,16 @@ if (swap_total > 0)
         gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (cpu_usage_progress_bar), cpu_usage);
         gtk_progress_bar_set_text (GTK_PROGRESS_BAR (cpu_usage_progress_bar), tooltip);
     }
+
+
+gchar *icon_path;
+    
+
+g_autofree gchar *icon_name = g_strdup_printf("cpu%d.png", (gint)(cpu_usage * 100.0) / 10);
+    icon_path = g_build_filename("/usr/share/lxtask/icons", icon_name, NULL);
+gtk_status_icon_set_from_file(global_status_icon,icon_path);
+
+
     return TRUE;
 }
 

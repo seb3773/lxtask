@@ -66,25 +66,37 @@ guint rID;
 
 int page_size;
 
+gboolean keep_above = FALSE;
 
-void on_menu_item_clicked(GtkMenuItem *menu_item, gpointer user_data) {
-    g_print("Menu item clicked\n");
+void on_keep_above_toggled(GtkCheckMenuItem *menu_item, gpointer user_data) {
+    keep_above = gtk_check_menu_item_get_active(menu_item);
+    gtk_window_set_keep_above(GTK_WINDOW(main_window), keep_above);
 }
+
+void on_quit_menu_item_activate(GtkMenuItem *menu_item, gpointer user_data) {
+    gtk_main_quit();
+}
+
+
+
 void on_status_icon_popup_menu(GtkStatusIcon *status_icon, gpointer user_data) {
     GtkWidget *menu;
-    GtkWidget *menu_item;
+    GtkWidget *keep_above_item;
+    GtkWidget *quit_item;
 
     // Créer le menu
     menu = gtk_menu_new();
 
-    // Ajouter des éléments au menu
-    menu_item = gtk_menu_item_new_with_label("Item 1");
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-    g_signal_connect(menu_item, "activate", G_CALLBACK(on_menu_item_clicked), NULL);
+    // Ajouter l'élément "Keep above" au menu
+    keep_above_item = gtk_check_menu_item_new_with_label("Keep above");
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(keep_above_item), keep_above);
+    g_signal_connect(keep_above_item, "toggled", G_CALLBACK(on_keep_above_toggled), NULL);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), keep_above_item);
 
-    menu_item = gtk_menu_item_new_with_label("Quit");
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-    g_signal_connect(menu_item, "activate", G_CALLBACK(on_menu_item_clicked), NULL);
+    // Ajouter l'élément "Quit" au menu
+    quit_item = gtk_menu_item_new_with_label("Quit");
+    g_signal_connect(quit_item, "activate", G_CALLBACK(on_quit_menu_item_activate), NULL);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), quit_item);
 
     // Afficher le menu
     gtk_widget_show_all(menu);

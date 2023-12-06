@@ -6,8 +6,8 @@ new features,and some improvement of the user interface.
 -Added swap usage/total gauge
 -Added CPU Speed in existing CPU gauge
 -Differents colors for each gauge
--Button 'Quit' replaced by a 'End task button' (we can close the windows with esc or the close button on the titlebar, I don't
- think I need a third quit button :p ) and it's more like win taskmgr end task button :)
+-Button 'Quit' replaced by a 'End task button' (we can close the windows with esc, the close button on the titlebar,
+ and with the menu File... I don't think I need a 4th quit action :p ) and it's more like win taskmgr end task button :)
 -the windows is centered at start, and (hopefully) properly sized depending on the resolution.
 -Replaced the priorities numbers by more comprehensible terms
 -some interface color modifications

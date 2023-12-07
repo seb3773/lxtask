@@ -25,6 +25,7 @@
 #include <glib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <glib/gi18n.h>
 
 
 
@@ -88,13 +89,14 @@ void on_status_icon_popup_menu(GtkStatusIcon *status_icon, gpointer user_data) {
     menu = gtk_menu_new();
 
     // Ajouter l'élément "Keep above" au menu
-    keep_above_item = gtk_check_menu_item_new_with_label("Keep above");
+    keep_above_item = gtk_check_menu_item_new_with_label (_("Keep above"));
+
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(keep_above_item), keep_above);
     g_signal_connect(keep_above_item, "toggled", G_CALLBACK(on_keep_above_toggled), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), keep_above_item);
 
     // Ajouter l'élément "Quit" au menu
-    quit_item = gtk_menu_item_new_with_label("Quit");
+    quit_item = gtk_menu_item_new_with_label (_("Quit"));
     g_signal_connect(quit_item, "activate", G_CALLBACK(on_quit_menu_item_activate), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), quit_item);
 

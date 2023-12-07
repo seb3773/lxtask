@@ -105,6 +105,12 @@ msgstr "Plus de détails"
 msgid "End task"
 msgstr "Fin de tâche"
 
+msgid "Keep above"
+msgstr "Toujours visible"
+
+msgid "Quit"
+msgstr "Fermer"
+
 #: ../src/interface.c:201
 msgid "Name"
 msgstr "Nom"

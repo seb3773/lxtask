@@ -6,7 +6,6 @@ gdouble get_cpu_speed(void)
     FILE *cpuinfo = fopen("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq", "r");
     if (cpuinfo == NULL)
     {
-        perror("Error opening /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq");
         return 0.0;
     }
 

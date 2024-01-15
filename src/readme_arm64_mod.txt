@@ -1,4 +1,4 @@
-make this adjustment to compile on arm64 in functions.c:
+make this adjustment for cpu speed on arm64 in functions.c:
 
 
 gdouble get_cpu_speed(void)

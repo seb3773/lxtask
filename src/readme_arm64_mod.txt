@@ -1,22 +1,34 @@
-make this adjustment for cpu speed on arm64 architecture in functions.c:
+make this adjustment for cpu speed on arm architecture in functions.c:
 
+add:
 
-gdouble get_cpu_speed(void)
-{
-    FILE *cpuinfo = fopen("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq", "r");
-    if (cpuinfo == NULL)
-    {
+#define MAX_COMMAND_OUTPUT_SIZE 100
+
+and change the double get_cpu_speed functon to:
+
+double get_cpu_speed() {
+    FILE *cmd_output = popen("vcgencmd measure_clock arm", "r");
+    if (cmd_output == NULL) {
+        fprintf(stderr, "Error executing command.\n");
         return 0.0;
     }
 
-    char line[256];
-    gdouble cpu_speed_value = 0.0;
+    char output[MAX_COMMAND_OUTPUT_SIZE];
+    char* frequency_string;
+    double cpu_speed_value = 0.0;
 
-    if (fgets(line, sizeof(line), cpuinfo))
-    {
-        sscanf(line, "%lf", &cpu_speed_value);
+    // Read command output
+    if (fgets(output, sizeof(output), cmd_output)) {
+        frequency_string = strstr(output, "="); // Locate the '=' character
+        if (frequency_string != NULL) {
+            cpu_speed_value = atof(frequency_string + 1); // Convert string to double
+        }
     }
 
-    fclose(cpuinfo);
-    return cpu_speed_value / 1000000.0; // Convert Hz to GHz
+    pclose(cmd_output);
+
+    // Convert Hz to GHz
+    return cpu_speed_value / 1000000000.0;
 }
+
+

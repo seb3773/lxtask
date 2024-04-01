@@ -9,7 +9,6 @@ and change the double get_cpu_speed functon to:
 double get_cpu_speed() {
     FILE *cmd_output = popen("vcgencmd measure_clock arm", "r");
     if (cmd_output == NULL) {
-        fprintf(stderr, "Error executing command.\n");
         return 0.0;
     }
 
@@ -21,7 +20,7 @@ double get_cpu_speed() {
     if (fgets(output, sizeof(output), cmd_output)) {
         frequency_string = strstr(output, "="); // Locate the '=' character
         if (frequency_string != NULL) {
-            cpu_speed_value = atof(frequency_string + 1); // Convert string to double
+            cpu_speed_value = atof(frequency_string + 1);
         }
     }
 

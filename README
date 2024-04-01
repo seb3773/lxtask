@@ -16,4 +16,4 @@ new features,and some improvement of the user interface.
 -systray menu with 'keep above' and quit   ;)
 
 
-Notes for compilation: it requires intltool and GTK+ 2.6 or newer.
+Notes for compilation: it requires intltool and GTK+ 2.6 or newer; use ./configure CFLAGS="-Ofast -flto"  for optimized build.

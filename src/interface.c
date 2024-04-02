@@ -26,6 +26,7 @@
 
 #include <glib/gi18n.h>
 #include "interface.h"
+#include <unistd.h>
 
 
 GtkTreeStore *list_store;
@@ -55,6 +56,21 @@ extern gint refresh_interval;
 extern guint rID;
 GtkWidget *refresh_spin;
 
+gboolean is_root() {
+    return geteuid() == 0;
+}
+
+void switch_to_root_mode(GtkWidget *widget, gpointer data) {
+    char binary_name[4096]; 
+    ssize_t len = readlink("/proc/self/exe", binary_name, sizeof(binary_name) - 1);
+    if (len != -1) {
+        binary_name[len] = '\0';  
+        char *args[] = { "sudo", binary_name, NULL };
+
+        execvp("tdesudo", args);
+
+    }
+}
 
 void on_kill_button_clicked(GtkButton *button, gpointer user_data)
 {
@@ -105,8 +121,11 @@ GtkWidget* create_main_window (void)
     gint width_in_pixels = screen_width / 2;
     gint height_in_pixels = screen_height / 1.5;
     gtk_window_resize(GTK_WINDOW(window), width_in_pixels, height_in_pixels);
-
+if (!is_root()) {
     gtk_window_set_title (GTK_WINDOW (window), _("Task Manager"));
+} else {
+    gtk_window_set_title (GTK_WINDOW (window), _("Task Manager - root"));
+}
     gtk_window_set_default_size (GTK_WINDOW (window), win_width, win_height);
     gtk_window_set_icon_name (GTK_WINDOW (window),"utilities-system-monitor");
 
@@ -128,9 +147,18 @@ GtkWidget* create_main_window (void)
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM (item), menu );
 	gtk_menu_shell_append( (GtkMenuShell*)menubar, item );
 
+if (!is_root()) {
+        item = gtk_menu_item_new_with_label("Switch to root mode");
+        gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+        g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(switch_to_root_mode), NULL);
+    }
+
+
 	item = gtk_image_menu_item_new_from_stock( GTK_STOCK_QUIT, NULL );
 	GtkAccelGroup* accel_group = gtk_accel_group_new();
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
+
+
 #if GTK_CHECK_VERSION(3,0,0)
 	gtk_widget_add_accelerator(item, "activate", accel_group,
 		GDK_KEY_Escape, (GdkModifierType)0, GTK_ACCEL_VISIBLE);
